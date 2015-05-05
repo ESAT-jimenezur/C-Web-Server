@@ -3,6 +3,8 @@
 
 #include <WinSock2.h>
 #include <stdio.h>
+#include <iostream>
+#include <string.h>
 
 
 namespace iJos{
@@ -13,13 +15,34 @@ namespace iJos{
     // Singleton instance
     static Server *Instance();
 
+    // Setters
+    void setServerIP(char* ip);
+    void setServerPort(int port);
+
+    //Getters
+    char* getServerIP();
+    int getServerPort();
+
     void init();
-    void listen();
+    void winsockInit();
+    void slisten();
+    void close();
 
   private:
     static Server *instance;
 
+    Server();
 
+    WSADATA wsa_;
+    SOCKET socket_, socket_cliente_;
+
+    struct sockaddr_in ip_, ip_c_;
+
+    char buffer_[512];
+    int request_, bytes_;
+
+    int server_port_;
+    char* server_ip_;
 
   };
 
