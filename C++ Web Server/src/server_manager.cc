@@ -13,7 +13,9 @@ namespace iJos{
     // Fill buffer with zeros
     memset(buffer_, '\0', 512);
 
-    request_ = sizeof(ip_);
+    debug_ = true;
+
+    size_ = sizeof(ip_);
     server_port_ = 8080;
     server_ip_ = "0.0.0.0";
   }
@@ -39,13 +41,14 @@ namespace iJos{
         WSACleanup();
       }
       else{
-
         if (listen(socket_, SOMAXCONN)){
-          
-        
+          printf("Error Apertura puerto");
         }
-
-        printf("Server started succesfully.\n");
+        else{
+          if (debug_){
+            printf("Server started succesfully.\n");
+          }
+        }
       }
       
     }
@@ -56,18 +59,26 @@ namespace iJos{
     while (true){
       socket_cliente_ = accept(socket_, (SOCKADDR*)&ip_c_, NULL);
 
-      request_ = recvfrom(socket_cliente_, buffer_, 512, 0, (SOCKADDR*)&ip_, &request_);
+      bytes_ = recvfrom(socket_cliente_, buffer_, 512, 0, (SOCKADDR*)&ip_, &size_);
       //printf("Cliente conectado con exito\n");
       //printf("IP cliente:%s", inet_ntoa(ip_c_.sin_addr));
       //printf("\n Puerto cliente:%d", ntohs(ip_c_.sin_port));
       
-      if (request_ > 0){
-        printf("%s \n", buffer_);
+      std::string request(buffer_);
+
+      if (bytes_ > 0){
+        if (debug_){
+          cout << request << endl;
+        }
+        
+        // Parse request to know if is a GET request
+
         memset(buffer_, '\0', 512);
       }
       
 
       closesocket(socket_cliente_);
+      WSACleanup();
     }
   }
 

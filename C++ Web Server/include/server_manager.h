@@ -4,8 +4,9 @@
 #include <WinSock2.h>
 #include <stdio.h>
 #include <iostream>
-#include <string.h>
+#include <string>
 
+using namespace std;
 
 namespace iJos{
 
@@ -36,10 +37,12 @@ namespace iJos{
     WSADATA wsa_;
     SOCKET socket_, socket_cliente_;
 
+    bool debug_;
+
     struct sockaddr_in ip_, ip_c_;
 
     char buffer_[512];
-    int request_, bytes_;
+    int size_, bytes_;
 
     int server_port_;
     char* server_ip_;
