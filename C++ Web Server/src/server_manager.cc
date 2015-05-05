@@ -103,9 +103,10 @@ namespace iJos{
   }
 
   void Server::GETRequest(std::string req){
-
+    
   }
 
+ 
 
   void Server::setServerIP(char* ip){
     server_ip_ = ip;

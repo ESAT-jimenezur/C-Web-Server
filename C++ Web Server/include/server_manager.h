@@ -3,7 +3,9 @@
 
 #include <WinSock2.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace std;
@@ -36,6 +38,8 @@ namespace iJos{
     void GETRequest(std::string req);
 
     Server();
+
+    const std::string base_url = "www";
 
     WSADATA wsa_;
     SOCKET socket_, socket_cliente_;
