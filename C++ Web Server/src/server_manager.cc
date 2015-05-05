@@ -71,7 +71,7 @@ namespace iJos{
           cout << request << endl;
         }
         
-        // Parse request to know if is a GET request
+        parseRequest(request);
 
         memset(buffer_, '\0', 512);
       }
@@ -80,6 +80,30 @@ namespace iJos{
       closesocket(socket_cliente_);
       WSACleanup();
     }
+  }
+
+
+  void Server::parseRequest(std::string req){
+    // Parse request to know if is a GET request
+
+    if (req.find("GET") != std::string::npos) {
+      // GET REQUEST
+      GETRequest(req);
+    }
+    else if (req.find("POST") != std::string::npos){
+      //POST REQUEST
+    }
+    else if (req.find("PUT") != std::string::npos){
+      //PUT REQUEST
+    }
+    else if (req.find("DELETE") != std::string::npos){
+      //DELETE REQUEST
+    }
+
+  }
+
+  void Server::GETRequest(std::string req){
+
   }
 
 

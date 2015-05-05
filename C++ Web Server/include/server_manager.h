@@ -31,6 +31,9 @@ namespace iJos{
 
   private:
     static Server *instance;
+    void parseRequest(std::string req);
+
+    void GETRequest(std::string req);
 
     Server();
 
