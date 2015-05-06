@@ -60,9 +60,6 @@ namespace iJos{
       socket_cliente_ = accept(socket_, (SOCKADDR*)&ip_c_, NULL);
 
       bytes_ = recvfrom(socket_cliente_, buffer_, 512, 0, (SOCKADDR*)&ip_, &size_);
-      //printf("Cliente conectado con exito\n");
-      //printf("IP cliente:%s", inet_ntoa(ip_c_.sin_addr));
-      //printf("\n Puerto cliente:%d", ntohs(ip_c_.sin_port));
       
       std::string request(buffer_);
 
@@ -111,12 +108,50 @@ namespace iJos{
     std::string resource_extension(resource_path);
     resource_extension = resource_extension.substr(resource_extension.find_last_of(".") + 1);
     
-    
-
-    printf("%s\n", resource_path);
-    std::cout << resource_extension << std::endl;
+    sendRequestedContent(resource_path, resource_extension.c_str());
+   
+    //printf("%s\n", resource_path);
+    //printf("%s\n", resource_extension.c_str());
+    //std::cout << resource_extension << std::endl;
   }
 
+  void Server::sendRequestedContent(const char *res_name, const char *res_ext){
+    std:string return_buffer = "HTTP/1.1 200 - OK\n";
+
+    if (strcmp(res_ext, "html") == 0){
+        return_buffer += "content-type: text/html\n";
+    }
+
+    /* LOAD FILE*/
+    std::stringstream file_streamstring;
+    std::string file_string;
+    std::ifstream file("www/index.html");
+    
+    if (file.is_open()){
+      file_streamstring << file.rdbuf();
+      file.close();
+      file_string = file_streamstring.str();
+    }
+    const char* file_src = file_string.c_str();
+
+    std::stringstream file_size_str;
+    std::string str;
+    file_size_str << file_string.size();
+    file_size_str >> str;
+
+    return_buffer += "accept-ranges: bytes\n";
+    return_buffer += "content-lenght ";
+    return_buffer += str;
+    return_buffer += "\n";
+    return_buffer += "connection: keep-Alive\n\n";
+    
+    return_buffer += file_src;
+
+    send(socket_cliente_, return_buffer.c_str(), file_string.size(), 0);
+    
+
+  }
+  
   
   char* Server::getRequestPath(const char *buf){
     

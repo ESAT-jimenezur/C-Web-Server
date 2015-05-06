@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -33,6 +34,9 @@ namespace iJos{
 
   private:
     static Server *instance;
+
+    Server();
+
     void parseRequest(std::string req);
 
     void GETRequest(std::string req);
@@ -40,7 +44,8 @@ namespace iJos{
     char* getRequestPath(const char *buffer);
     char* getResourceExtension(const char *res);
 
-    Server();
+    void sendRequestedContent(const char *res_name, const char *res_ext);
+
 
     const std::string base_url = "www";
 
