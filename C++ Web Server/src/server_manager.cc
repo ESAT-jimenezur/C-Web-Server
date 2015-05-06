@@ -104,9 +104,17 @@ namespace iJos{
 
   void Server::GETRequest(std::string req){
     const char * buf = req.c_str();
-    char* resource = getRequestPath(buf);
 
-    printf("%s", resource);
+    // Get requested resource (Path)
+    char* resource_path = getRequestPath(buf);
+    // Get extension of that file
+    std::string resource_extension(resource_path);
+    resource_extension = resource_extension.substr(resource_extension.find_last_of(".") + 1);
+    
+    
+
+    printf("%s\n", resource_path);
+    std::cout << resource_extension << std::endl;
   }
 
   

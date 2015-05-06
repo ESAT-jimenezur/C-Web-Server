@@ -38,6 +38,7 @@ namespace iJos{
     void GETRequest(std::string req);
 
     char* getRequestPath(const char *buffer);
+    char* getResourceExtension(const char *res);
 
     Server();
 
