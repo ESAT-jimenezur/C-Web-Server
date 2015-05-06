@@ -67,15 +67,12 @@ namespace iJos{
         if (debug_){
           cout << request << endl;
         }
-        
         parseRequest(request);
-
         memset(buffer_, '\0', 512);
       }
       
 
       closesocket(socket_cliente_);
-      WSACleanup();
     }
   }
 
@@ -109,23 +106,48 @@ namespace iJos{
     resource_extension = resource_extension.substr(resource_extension.find_last_of(".") + 1);
     
     sendRequestedContent(resource_path, resource_extension.c_str());
-   
-    //printf("%s\n", resource_path);
-    //printf("%s\n", resource_extension.c_str());
-    //std::cout << resource_extension << std::endl;
   }
 
   void Server::sendRequestedContent(const char *res_name, const char *res_ext){
     std:string return_buffer = "HTTP/1.1 200 - OK\n";
 
-    if (strcmp(res_ext, "html") == 0){
+    //printf("Req: %s\n", res_name);
+    printf("Req: %s\n", res_ext);
+
+    if (strcmp(res_ext, "html") == 0 || strcmp(res_ext, "htm") == 0){
         return_buffer += "content-type: text/html\n";
     }
+
+    if (strcmp(res_ext, "css") == 0){
+      return_buffer += "content-type: text/css\n";
+    }
+
+    if ( strcmp(res_ext, "jpg") == 0 
+      || strcmp(res_ext, "jpeg") == 0
+      || strcmp(res_ext, "png") == 0){
+      return_buffer += "content-type: image/*\n";
+    }
+
+    if (strcmp(res_ext, "js") == 0){
+      return_buffer += "content-type: application/javascript\n";
+    }
+
+
+    /*
+    if (strcmp(res_ext, "ico") == 0){
+      return_buffer += "content-type: text/css\n";
+    }
+    */
 
     /* LOAD FILE*/
     std::stringstream file_streamstring;
     std::string file_string;
-    std::ifstream file("www/index.html");
+
+    std::string resource_full_path = base_url;
+                resource_full_path += res_name;
+    std::ifstream file(resource_full_path);
+
+    //printf("%s", resource_full_path.c_str());
     
     if (file.is_open()){
       file_streamstring << file.rdbuf();
@@ -140,7 +162,7 @@ namespace iJos{
     file_size_str >> str;
 
     return_buffer += "accept-ranges: bytes\n";
-    return_buffer += "content-lenght ";
+    return_buffer += "content-lenght: ";
     return_buffer += str;
     return_buffer += "\n";
     return_buffer += "connection: keep-Alive\n\n";
@@ -183,7 +205,6 @@ namespace iJos{
       path = (char*)malloc(pathLen + 1);
       if (NULL == path){
         fprintf(stderr, "malloc() failed. \n");
-        WSACleanup();
       }
 
     }
