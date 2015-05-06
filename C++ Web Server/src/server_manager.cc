@@ -103,9 +103,58 @@ namespace iJos{
   }
 
   void Server::GETRequest(std::string req){
-    
+    const char * buf = req.c_str();
+    char* resource = getRequestPath(buf);
+
+    printf("%s", resource);
   }
 
+  
+  char* Server::getRequestPath(const char *buf){
+    
+    // Parse GET request
+    // http://stackoverflow.com/questions/24462863/parse-url-path-of-get-request
+
+    const char *start = buf;
+    const char *end;
+    char *path = NULL;
+    size_t pathLen;
+
+    /* Verify that there is a 'GET ' at the beginning of the string. */
+    if (strncmp("GET ", start, 4)){
+      printf("Parse error: 'GET ' is missing.\n");
+      WSACleanup();
+    }
+    
+    /* Set the start pointer at the first character beyond the 'GET '. */
+    start += 4;
+
+    /* From the start position, set the end pointer to the first white-space character found in the string. */
+    end = start;
+
+    while (*end && !isspace(*end)){
+      ++end;
+
+      /* Calculate the path length, and allocate sufficient memory for the path plus string termination. */
+      pathLen = (end - start);
+      path = (char*)malloc(pathLen + 1);
+      if (NULL == path){
+        fprintf(stderr, "malloc() failed. \n");
+        WSACleanup();
+      }
+
+    }
+
+    /* Copy the path string to the path storage. */
+    memcpy(path, start, pathLen);
+    
+    /* Terminate the string. */
+    path[pathLen] = '\0';
+
+    /* Return the allocated storage, or NULL in the event of an error, to the caller. */
+    return(path);
+  }
+  
  
 
   void Server::setServerIP(char* ip){

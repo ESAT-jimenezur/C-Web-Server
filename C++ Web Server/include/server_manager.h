@@ -37,6 +37,8 @@ namespace iJos{
 
     void GETRequest(std::string req);
 
+    char* getRequestPath(const char *buffer);
+
     Server();
 
     const std::string base_url = "www";
