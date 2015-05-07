@@ -112,7 +112,7 @@ namespace iJos{
     std:string return_buffer = "HTTP/1.1 200 - OK\n";
 
     //printf("Req: %s\n", res_name);
-    printf("Req: %s\n", res_ext);
+    //printf("Req: %s\n", res_ext);
 
     if (strcmp(res_ext, "html") == 0 || strcmp(res_ext, "htm") == 0){
         return_buffer += "content-type: text/html\n";
