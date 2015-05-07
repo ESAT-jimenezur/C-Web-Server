@@ -126,6 +126,7 @@ namespace iJos{
       || strcmp(res_ext, "jpeg") == 0
       || strcmp(res_ext, "png") == 0){
       return_buffer += "content-type: image/*\n";
+      //return_buffer += "content-disposition: attachment;\n"; // Test this
     }
 
     if (strcmp(res_ext, "js") == 0){
