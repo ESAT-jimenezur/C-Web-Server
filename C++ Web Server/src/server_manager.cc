@@ -128,14 +128,11 @@ namespace iJos{
     if (strcmp(res_name, "/") == 0 && strcmp(res_ext, "/") == 0){
       res_name = "/index.html";
       res_ext = "html";
-      
     }
     
-
+    // Start creating request
     std:string return_buffer = "HTTP/1.1 200 - OK\n";
 
-    //printf("Req: %s\n", res_name);
-    //printf("Req: %s\n", res_ext);
 
     if (strcmp(res_ext, "html") == 0 || strcmp(res_ext, "htm") == 0){
         return_buffer += "content-type: text/html\n";
@@ -183,6 +180,18 @@ namespace iJos{
     std::string str;
     file_size_str << file_string.size();
     file_size_str >> str;
+    
+
+    /* TODO 
+    std::string resource_full_path = base_url;
+    resource_full_path += res_name;
+    const char* file_src = "";
+    FILE *file = fopen(resource_full_path.c_str(), "rb");
+    while (!feof(file)){
+      char c = fgetc(file);
+      file_src += c;
+    }
+    */
 
     return_buffer += "accept-ranges: bytes\n";
     return_buffer += "content-lenght: ";
@@ -241,8 +250,6 @@ namespace iJos{
     /* Return the allocated storage, or NULL in the event of an error, to the caller. */
     return(path);
   }
-  
- 
 
   void Server::setServerIP(char* ip){
     server_ip_ = ip;
@@ -259,7 +266,6 @@ namespace iJos{
   int Server::getServerPort(){
     return server_port_;
   }
-
 
   void Server::close(){
     closesocket(socket_);
