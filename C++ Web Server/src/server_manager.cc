@@ -6,14 +6,15 @@ namespace iJos{
     return &instance;
   }
 
-  Server::Server(){
-  }
+  Server::Server(){}
 
   void Server::init(){
     // Fill buffer with zeros
     memset(buffer_, '\0', 1024);
 
-    debug_ = true;
+    debug_ = false;
+
+    started_with_port_param_ = false;
 
     size_ = sizeof(ip_);
     server_port_ = 8080;
@@ -22,19 +23,23 @@ namespace iJos{
 
   void Server::winsockInit(){
 
-    unsigned int n_port;
-    cout << "Select server port (Default will be 8080) ";
-    cin >> n_port;
+    if (!started_with_port_param_){
+      unsigned int n_port;
+      cout << "Select server port (Default will be 8080) ";
+      cin >> n_port;
 
-    if (n_port <= 1024 || n_port > 65535){
-      cout << "Port should be a number greater than 1024 and lower than 65535\n";
-      cout << "Server setup will exit now.\n Restart the server to start configuration again\n";
-      system("pause");
-      system("exit");
+      if (n_port <= 1024 || n_port > 65535){
+        cout << "Port should be a number greater than 1024 and lower than 65535\n";
+        cout << "Server setup will exit now.\n Restart the server to start configuration again\n";
+        system("pause");
+        system("exit");
+      }
+      else{
+        server_port_ = n_port;
+      }
+
     }
-    else{
-      server_port_ = n_port;
-    }
+
 
     if (WSAStartup(MAKEWORD(2, 0), &wsa_) != 0){
       printf("WSA Initialization failed.\n");
@@ -85,7 +90,6 @@ namespace iJos{
         memset(buffer_, '\0', 1024);
       }
       
-
       closesocket(socket_cliente_);
     }
   }
@@ -111,7 +115,7 @@ namespace iJos{
   }
 
   void Server::GETRequest(std::string req){
-    const char * buf = req.c_str();
+    const char *buf = req.c_str();
 
     // Get requested resource (Path)
     char* resource_path = getRequestPath(buf);
@@ -119,20 +123,60 @@ namespace iJos{
     std::string resource_extension(resource_path);
     resource_extension = resource_extension.substr(resource_extension.find_last_of(".") + 1);
     
-    sendRequestedContent(resource_path, resource_extension.c_str());
+    //std::cout << " *** REQ *** \n" << req << "\n *** REQ *** " << endl;
+
+    const char *virtualhost;
+    virtualhost = strtok((char*)buf, "\n");
+    virtualhost = strtok(NULL, " ");
+
+    
+    std::string port_str = ":" + std::to_string(getServerPort());
+    const char *port_char = port_str.c_str();
+    
+
+    virtualhost = strtok(NULL, port_char);
+    virtualhost = strtok(NULL, "\r");
+
+    //std::cout << virtualhost << endl;
+
+    sendRequestedContent(resource_path, resource_extension.c_str(), virtualhost);
   }
 
-  void Server::sendRequestedContent(const char *res_name, const char *res_ext){
+  void Server::sendRequestedContent(const char *res_name, const char *res_ext, const char *res_domain){
+
+  std:string return_buffer;
 
     // If GET call is empty, return index
     if (strcmp(res_name, "/") == 0 && strcmp(res_ext, "/") == 0){
       res_name = "/index.html";
       res_ext = "html";
     }
-    
-    // Start creating request
-    std:string return_buffer = "HTTP/1.1 200 - OK\n";
 
+    std::stringstream file_streamstring;
+    std::string file_string;
+
+    std::string resource_full_path = base_url;
+    resource_full_path += res_name;
+
+    std::ifstream file(resource_full_path, ios::binary);
+
+    if (file.is_open()){
+      file_streamstring << file.rdbuf();
+      file.close();
+      file_string = file_streamstring.str();
+      // Start creating request
+     return_buffer = "HTTP/1.1 200 - OK\n";
+    }
+    else{ // File not exist
+    return_buffer = "HTTP/1.1 404 - Not Found\n";
+    }
+    const char* file_src = file_string.c_str();
+
+    std::stringstream file_size_str;
+    std::string str;
+    file_size_str << file_string.size();
+    file_size_str >> str;
+    
 
     if (strcmp(res_ext, "html") == 0 || strcmp(res_ext, "htm") == 0){
         return_buffer += "content-type: text/html\n";
@@ -153,47 +197,13 @@ namespace iJos{
       return_buffer += "content-type: application/javascript\n";
     }
 
-    
     if (strcmp(res_ext, "ico") == 0){
-      return_buffer += "content-type: image/x-icon\n";
+      // This breaks the server :/
+      // return_buffer += "content-type: image/x-icon\n";
     }
     
-
-    /* LOAD FILE*/
-
-    /* TODO 
-    std::string resource_full_path = base_url;
-    resource_full_path += res_name;
-    const char* file_src = "";
-    FILE *file = fopen(resource_full_path.c_str(), "rb");
-    while (!feof(file)){
-    char c = fgetc(file);
-    file_src += c;
-    }
-    */
     
-    std::stringstream file_streamstring;
-    std::string file_string;
-
-    std::string resource_full_path = base_url;
-                resource_full_path += res_name;
-
-    std::ifstream file(resource_full_path, ios::binary);
     
-    if (file.is_open()){
-      file_streamstring << file.rdbuf();
-      file.close();
-      file_string = file_streamstring.str();
-    }
-    const char* file_src = file_string.c_str();
-
-    std::stringstream file_size_str;
-    std::string str;
-    file_size_str << file_string.size();
-    file_size_str >> str;
-    
-
-
 
     return_buffer += "accept-ranges: bytes\n";
     return_buffer += "content-lenght: ";
@@ -205,7 +215,6 @@ namespace iJos{
 
     send(socket_cliente_, return_buffer.c_str(), file_string.size(), 0);
     
-
   }
   
   
@@ -268,10 +277,15 @@ namespace iJos{
   int Server::getServerPort(){
     return server_port_;
   }
+  
+  void Server::serverStartedWithParams(bool status){
+    started_with_port_param_ = status;
+  }
 
   void Server::close(){
     closesocket(socket_);
   }
+
   
 }
 

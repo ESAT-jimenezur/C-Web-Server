@@ -22,6 +22,7 @@ namespace iJos{
     // Setters
     void setServerIP(char* ip);
     void setServerPort(int port);
+    void serverStartedWithParams(bool status);
 
     //Getters
     char* getServerIP();
@@ -34,6 +35,7 @@ namespace iJos{
 
   private:
     static Server *instance;
+    bool started_with_port_param_;
 
     Server();
 
@@ -44,7 +46,7 @@ namespace iJos{
     char* getRequestPath(const char *buffer);
     char* getResourceExtension(const char *res);
 
-    void sendRequestedContent(const char *res_name, const char *res_ext);
+    void sendRequestedContent(const char *res_name, const char *res_ext, const char *res_domain);
 
 
     const std::string base_url = "www";
