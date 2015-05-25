@@ -160,14 +160,25 @@ namespace iJos{
     
 
     /* LOAD FILE*/
+
+    /* TODO 
+    std::string resource_full_path = base_url;
+    resource_full_path += res_name;
+    const char* file_src = "";
+    FILE *file = fopen(resource_full_path.c_str(), "rb");
+    while (!feof(file)){
+    char c = fgetc(file);
+    file_src += c;
+    }
+    */
+    
     std::stringstream file_streamstring;
     std::string file_string;
 
     std::string resource_full_path = base_url;
                 resource_full_path += res_name;
-    std::ifstream file(resource_full_path);
 
-    //printf("%s", resource_full_path.c_str());
+    std::ifstream file(resource_full_path, ios::binary);
     
     if (file.is_open()){
       file_streamstring << file.rdbuf();
@@ -182,16 +193,7 @@ namespace iJos{
     file_size_str >> str;
     
 
-    /* TODO 
-    std::string resource_full_path = base_url;
-    resource_full_path += res_name;
-    const char* file_src = "";
-    FILE *file = fopen(resource_full_path.c_str(), "rb");
-    while (!feof(file)){
-      char c = fgetc(file);
-      file_src += c;
-    }
-    */
+
 
     return_buffer += "accept-ranges: bytes\n";
     return_buffer += "content-lenght: ";
