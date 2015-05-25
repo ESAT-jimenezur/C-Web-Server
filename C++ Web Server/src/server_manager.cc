@@ -11,7 +11,7 @@ namespace iJos{
 
   void Server::init(){
     // Fill buffer with zeros
-    memset(buffer_, '\0', 512);
+    memset(buffer_, '\0', 1024);
 
     debug_ = true;
 
@@ -21,6 +21,20 @@ namespace iJos{
   }
 
   void Server::winsockInit(){
+
+    unsigned int n_port;
+    cout << " Select server port (Default will be 8080) ";
+    cin >> n_port;
+
+    if (n_port <= 1024 || n_port > 65535){
+      cout << "Port should be a number greater than 1024 and lower than 65535\n";
+      cout << "Server setup will exit now.\n Restart the server to start configuration again\n";
+      system("pause");
+      system("exit");
+    }
+    else{
+      server_port_ = n_port;
+    }
 
     if (WSAStartup(MAKEWORD(2, 0), &wsa_) != 0){
       printf("WSA Initialization failed.\n");
@@ -59,7 +73,7 @@ namespace iJos{
     while (true){
       socket_cliente_ = accept(socket_, (SOCKADDR*)&ip_c_, NULL);
 
-      bytes_ = recvfrom(socket_cliente_, buffer_, 512, 0, (SOCKADDR*)&ip_, &size_);
+      bytes_ = recvfrom(socket_cliente_, buffer_, 1024, 0, (SOCKADDR*)&ip_, &size_);
       
       std::string request(buffer_);
 
@@ -68,7 +82,7 @@ namespace iJos{
           cout << request << endl;
         }
         parseRequest(request);
-        memset(buffer_, '\0', 512);
+        memset(buffer_, '\0', 1024);
       }
       
 
