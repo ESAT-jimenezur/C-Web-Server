@@ -23,7 +23,7 @@ namespace iJos{
   void Server::winsockInit(){
 
     unsigned int n_port;
-    cout << " Select server port (Default will be 8080) ";
+    cout << "Select server port (Default will be 8080) ";
     cin >> n_port;
 
     if (n_port <= 1024 || n_port > 65535){
@@ -123,6 +123,15 @@ namespace iJos{
   }
 
   void Server::sendRequestedContent(const char *res_name, const char *res_ext){
+
+    // If GET call is empty, return index
+    if (strcmp(res_name, "/") == 0 && strcmp(res_ext, "/") == 0){
+      res_name = "/index.html";
+      res_ext = "html";
+      
+    }
+    
+
     std:string return_buffer = "HTTP/1.1 200 - OK\n";
 
     //printf("Req: %s\n", res_name);
@@ -147,12 +156,11 @@ namespace iJos{
       return_buffer += "content-type: application/javascript\n";
     }
 
-
-    /*
+    
     if (strcmp(res_ext, "ico") == 0){
-      return_buffer += "content-type: text/css\n";
+      return_buffer += "content-type: image/x-icon\n";
     }
-    */
+    
 
     /* LOAD FILE*/
     std::stringstream file_streamstring;
